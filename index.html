@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTR Management - Inspection System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; background: white; border-right: 1px solid #e2e8f0; z-index: 10; }
+        .main-content { margin-left: 260px; padding: 40px; }
+        .modal-overlay { background: rgba(0, 0, 0, 0.7); display: none; position: fixed; inset: 0; z-index: 9999; overflow-y: auto; padding: 20px; justify-content: center; align-items: flex-start; }
+        .form-container { background: white; width: 100%; max-width: 900px; padding: 30px; border: 2px solid #000; border-radius: 4px; position: relative; }
+        .btr-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+        .btr-table th, .btr-table td { border: 1px solid #000; padding: 8px 12px; font-size: 11px; color: #000; vertical-align: middle; }
+        .header-blue { background-color: #0070C0; color: white; text-align: center; }
+        .btn-camera { display: flex; align-items: center; gap: 6px; background-color: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 5px 12px; color: #64748b; font-size: 10px; margin-top: 8px; cursor: pointer; width: fit-content; }
+        .finding-input { border-bottom: 1px dashed #94a3b8 !important; outline: none; width: 100%; font-size: 11px; padding: 4px 0; background: transparent; border:none; }
+        .sig-canvas { border: 1px solid #cbd5e1; background: #fff; width: 100%; height: 120px; }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar p-6 no-print">
+        <h1 class="font-bold text-xl text-slate-800">BTR Management</h1>
+        <p class="text-[10px] text-slate-400 uppercase mb-10">Inspection System</p>
+        <div class="p-3 bg-blue-50 text-blue-600 rounded-lg font-bold"><i class="fas fa-th-large mr-2"></i> Dashboard</div>
+    </div>
+
+    <div class="main-content no-print">
+        <h3 class="font-bold text-slate-800 mb-6 text-lg">Pilih Area Inspeksi</h3>
+        <div id="grid-container" class="grid grid-cols-4 gap-4"></div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="form-container" id="printable-area">
+            <button onclick="closeModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full no-print font-bold shadow-lg">X</button>
+            
+            <div class="flex border-2 border-black mb-4 bg-white">
+                <div class="w-1/4 p-2 border-r-2 border-black flex items-center justify-center">
+                    <img id="form-logo" style="max-height: 75px; width: auto;" alt="Logo PT Batutua">
+                </div>
+                <div class="w-2/4 header-blue p-2 border-r-2 border-black flex flex-col justify-center text-center">
+                    <p class="text-[9px]">FORM (FRM)</p>
+                    <h2 id="form-title" class="font-bold uppercase text-base tracking-widest">INSPEKSI</h2>
+                </div>
+                <div class="w-1/4 p-2 text-[10px] flex flex-col justify-center font-bold">No Dok: BTR-SCM-001<br>Rev: 1.0</div>
+            </div>
+
+            <table class="btr-table mb-4">
+                <tr><td width="20%">Department</td><td width="30%">-</td><td width="20%">Lokasi</td><td width="30%" id="loc-name" class="font-bold"></td></tr>
+                <tr><td>Tanggal Inspeksi</td><td><input type="date" class="w-full outline-none"></td><td>Di Inspeksi Oleh</td><td><input type="text" class="w-full outline-none" placeholder="..."></td></tr>
+            </table>
+
+            <table class="btr-table mb-4">
+                <thead><tr class="bg-gray-100 font-bold"><th width="40">NO</th><th>ITEM PEMERIKSAAN & FOTO</th><th width="60">YA</th><th width="60">TDK</th></tr></thead>
+                <tbody id="checklist-body"></tbody>
+            </table>
+
+            <h4 class="text-red-600 font-bold text-[11px] mb-1 italic border-l-4 border-red-600 pl-2 uppercase">Temuan & Perbaikan</h4>
+            <table class="btr-table mb-4">
+                <thead><tr><th width="40">NO</th><th>URAIAN TEMUAN & TINDAKAN</th><th width="200">PIC & TARGET</th></tr></thead>
+                <tbody>
+                    <tr><td align="center">1</td><td class="p-2"><input type="text" class="finding-input" placeholder="Isi temuan..."><div class="mt-1 border-t border-dashed border-slate-300"></div><input type="text" class="finding-input" placeholder="Isi perbaikan..."></td><td class="p-2"><input type="text" class="finding-input" placeholder="PIC"><input type="date" class="w-full mt-1 border p-1 rounded text-[10px]"></td></tr>
+                </tbody>
+            </table>
+
+            <div class="grid grid-cols-3 gap-6 text-center text-[10px]">
+                <div><p>Diinspeksi Oleh:</p><canvas id="s1" class="sig-canvas mt-2"></canvas><p class="mt-1 border-t border-black pt-1">( Inspector )</p></div>
+                <div><p>Mengetahui (Spv):</p><canvas id="s2" class="sig-canvas mt-2"></canvas><p class="mt-1 border-t border-black pt-1">( Supervisor )</p></div>
+                <div><p>Mengetahui (Head):</p><canvas id="s3" class="sig-canvas mt-2"></canvas><p class="mt-1 border-t border-black pt-1">( Dept Head )</p></div>
+            </div>
+
+            <div class="mt-8 flex gap-4 no-print">
+                <button onclick="savePDF()" class="flex-1 bg-sky-500 text-white font-bold py-3 rounded hover:bg-sky-600 shadow">SIMPAN PDF</button>
+                <button onclick="closeModal()" class="flex-1 bg-gray-200 py-3 rounded">BATAL</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // LOGO PT BATUTUA KHARISMA PERMAI (BASE64) - PERMANEN
+        const batutuaLogo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABpCAMAAABvD84PAAAAVFBMVEUAAAA6OjtXWFlcXWFeX2FmZ2hpZ2h0dXV7enp/f3+BgYGGh4eNjY2YmJikpKSurq64uLjBwcHNzc3Z2dnk5OTs7Ozy8vL6+vr///8+Pj5mZmb////8pY22AAAAAnRSTlMAAHaTzTgAAALGSURBVGje7ZjbcuMgEER7B0ICIZ7//7vLw7W9vrtrmvK0U6VyUqkq70yChA5IuD5LpI/99qT/6H05X86nU8v5tL/8M29Z1iXLumZd16zrunW5N869ZZn9vWVe86vI6z9X8fL/B6f//+D075fD039fDk//fTk8/fcl0n9fIv33/4E8o4O8mYFpZmA2KzB/H0y2Gcg8971fR5YvK9v/6Ff7fGv9pZ/Wf+qN9Z+6S/2n7lZ/Wf+p+9Vf+v8PyP7U9rP39P7z969vXzP7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+8/d7p/pP3X+Wf9S66/1X/W0f9Tae38ByBv8YwaW6+AAAAAElFTkSuQmCC";
+
+        const areaData = {
+            "Container T": ["Container bersih & rapi, tidak ada tumpahan/sampah", "Struktur Container (tidak penyok/bocor)", "Pintu container bisa dibuka/tutup dengan baik", "Lantai container kering, tidak licin dan kotor", "Blower berfungsi baik", "Penataan B3 rapi & sesuai jenis", "Kemasan tidak bocor/penyok", "Spill kit tersedia & lengkap", "Container dikunci", "Safety Shower/Eyewash normal", "APAR pressure normal & inspeksi valid", "Label B3 sesuai", "MSDS tersedia dan masih berlaku", "Penerangan cukup"],
+            "Container S": ["Container bersih & rapi, tidak ada tumpahan/sampah", "Struktur Container (tidak penyok/bocor)", "Pintu container bisa dibuka/tutup dengan baik", "Lantai container kering, tidak licin dan kotor", "Blower berfungsi baik", "Penataan B3 rapi & sesuai jenis", "Kemasan tidak bocor/penyok", "Spill kit tersedia & lengkap", "Container dikunci", "Safety Shower/Eyewash normal", "APAR pressure normal & inspeksi valid", "Label B3 sesuai", "MSDS tersedia dan masih berlaku", "Penerangan cukup"],
+            "Reagent Storage Yard": ["Area bersih & bebas tumpahan", "Drum,IBC,Isotank dalam kondisi baik(tidak bocor/korosi)", "Barang dengan kemasan karung tidak bocor/rusak", "Barang di simpan sesuai jenis", "APAR pressure normal & inspeksi valid", "Tidak ada barang di Yard tanpa cover", "Spill kit lengkap dan siap pakai", "MSDS tersedia dan Valid", "Eyewash & safety shower berfungsi", "Akses terbatas & terkunci", "Tidak ada aktivitas tidak aman"],
+            "Fuel Station": ["Lantai bersih, tidak licin, bebas tumpahan", "Pompa Fuel Layak di operasikan", "Hose & Nozzle tidak bocor/retak", "Auto cut-off nozzle berfungsi dengan baik", "Grounding atau earthing terpasang dan di uji", "APAR pressure normal & inspeksi valid", "Wheel Chock tersedia dan dalam kondisi baik", "Spill kit tersedia dan lengkap", "Limbah B3 di simpan sesuai regulasi", "Tumpahan fuel di tangani dengan baik", "Safety shower/Eyewash normal", "Kotak sampah kontaminasi dan general tersedia", "Area fuel station bersih dari sampah", "Pump dan fuel gun berfungsi dengan baik"],
+            "Oil Boom": ["Dinding/dasar tidak bocor", "Tidak overflow/meluap,level cairan masih dalam batas aman (>20cm under cover)", "Tidak ada sampah asing di dalam fuel trap(plastik,daun,kertas)", "Outlet dan pipa drain tidak tersumbat, aliran lancer", "Endapan sludge/lumpur tidak berlebihan dan belum melewati batas cleaning (ketebalan lumpur < 20cm)", "Cover/grating terpasang aman dan tidak rusak", "Area sekitar bersih dari tumpahan fuel/oli dan tidak licin", "Tidak ada bau menyengat berlebihan", "Spill kit tersedia dan siap di gunakan di area fuel trap"],
+            "Oil Storage": ["Area bersih dan rapi", "Tidak ada tumpahan oli/minyak", "Tidak ada genangan air", "Akses jalan aman & tidak licin", "Penerangan memadai", "Drum/kemasan tidak bocor", "Tidak ada karat/korosi berat", "Drum dalam keadaan tertutup rapat", "Label jenis oli jelas dan terbaca", "APAR pressure normal & inspeksi valid", "Spill kit tersedia dan lengkap", "Sign B3 tersedia dan sesuai", "MSDS tersedia dan valid", "Drum / IBC di susun rapi dan sesuai jenis"],
+            "Main Tank Fuel": ["Area bersih dan bebas tumpahan", "Tidak ada genangan air di sekitar tangki", "Akses jalan aman dan tidak licin", "Pagar dan pembatas area baik", "Rambu K3 terpasang", "Badan Tangki tidak bocor/retak", "Tidak ada korosi berlebihan", "Cat pelindung masih baik", "Name plate dan kapasitas terbaca", "Fondasi tangki stabil", "Pipa inlet/outlet tidak bocor", "Valve berfungsi normal", "Penyangga pipa kokoh", "Bundwall utuh", "Drain bundwall tertutup & terkunci"],
+            "Gas Storage": ["Area bersih dan rapi", "MSDS tersedia dan mudah di akses", "Penerangan cukup dan aman", "Posisi Tabung tersusun dengan rapi ,tegak & dirantai", "Valve cap terpasang saat di gunakan", "Konsidi Fisik tabung tidak penyok/korosi", "Pemisahan tabung Full/Empty terpisah", "Kebocoran gas tidak terdeteksi bau/bocor", "APAR pressure normal & inspeksi valid", "Rambu Larangan tersedia", "Tidak ada sumber api di area", "Tabung gas di simpan sesuai jenis", "Keranjang certified dan valid"],
+            "Jetty Area": ["Area bersih dan tertata rapi", "Bollard/ Mooring poin terpasang kuat", "Fender Jetty dalam kondisi baik", "Handrail & guardrail lengkap dan kokoh", "Tangga jetty & akses naik turun aman", "Spill kit lengkap & siap pakai", "Eye wash & safety shower berfungsi", "Penerangan area jetty berfungsi", "Tidak ada potensi pencemaran laut", "Tidak ada tumpahan BBM/oli di area Jetty", "APAR pressure normal & inspeksi valid"],
+            "Laydown Yard": ["Area yard bersih, bebas sampah & material tidak terpakai", "Permukaan jalan/yard rata, tidak berlubang & tidak licin", "Drainase berfungsi baik", "Penerangan area cukup", "Material ditata rapi dan stabil", "Tidak ada Container overstack", "Pallet/kayu kondisi baik", "APAR valid", "Area aman kebakaran"],
+            "Warehouse Area": ["Lantai bersih, tidak licin, bebas tumpahan", "Barang tersusun rapi sesuai area", "Jalur forklift & pejalan kaki jelas", "Tempat sampah tersedia & tidak penuh", "Kondisi rak tidak rusak / bengkok", "Beban rak sesuai kapasitas", "Label kapasitas rak terpasang", "Semua barang disimpan dalam keadaan aman", "Barang diberi label & identitas jelas", "Pallet dalam kondisi baik", "APAR pressure normal & inspeksi valid", "Rambu K3 & jalur evakuasi jelas", "Kabel tidak terkelupas / semrawut", "Penerangan memandai", "CCTV / sistem keamanan berfungsi", "Tagging electrical, lifting & tangga Valid"]
+        };
+
+        const grid = document.getElementById('grid-container');
+        Object.keys(areaData).forEach(name => {
+            grid.innerHTML += `<div class="bg-white p-5 rounded-xl border flex flex-col justify-between shadow-sm hover:border-blue-500 transition-all cursor-default">
+                <h4 class="font-bold text-sm mb-1">${name}</h4>
+                <button onclick="openForm('${name}')" class="mt-6 w-full bg-white border border-slate-200 py-2 rounded-lg text-[11px] font-bold text-slate-500 hover:bg-blue-600 hover:text-white transition-all">START -></button>
+            </div>`;
+        });
+
+        let p1, p2, p3;
+        window.onload = () => {
+            p1 = new SignaturePad(document.getElementById('s1'));
+            p2 = new SignaturePad(document.getElementById('s2'));
+            p3 = new SignaturePad(document.getElementById('s3'));
+            // Tampilkan Logo BTR
+            document.getElementById('form-logo').src = batutuaLogo;
+        };
+
+        function openForm(name) {
+            document.getElementById('form-title').innerText = "INSPEKSI - " + name;
+            document.getElementById('loc-name').innerText = name;
+            const body = document.getElementById('checklist-body');
+            body.innerHTML = "";
+            const items = areaData[name];
+            items.forEach((text, i) => {
+                body.innerHTML += `<tr><td align="center"><b>${i+1}</b></td><td>${text}<br><button class="btn-camera no-print"><i class="fas fa-camera"></i> Ambil Foto</button></td><td align="center"><input type="radio" name="r${i}" style="transform: scale(1.3);"></td><td align="center"><input type="radio" name="r${i}" style="transform: scale(1.3);"></td></tr>`;
+            });
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            p1.clear(); p2.clear(); p3.clear();
+        }
+
+        function savePDF() {
+            const element = document.getElementById('printable-area');
+            html2pdf().set({ margin: 0.3, filename: 'Inspeksi_BTR.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4' } }).from(element).save();
+        }
+    </script>
+</body>
+</html>
