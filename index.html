@@ -70,9 +70,9 @@
             </table>
 
             <div class="grid grid-cols-3 gap-6 text-center text-[10px]">
-                <div><p>Diinspeksi Oleh:</p><canvas id="s1" class="sig-canvas mt-2"></canvas><p class="mt-1 border-t border-black pt-1">( Inspector )</p></div>
-                <div><p>Mengetahui (Spv):</p><canvas id="s2" class="sig-canvas mt-2"></canvas><p class="mt-1 border-t border-black pt-1">( Supervisor )</p></div>
-                <div><p>Mengetahui (Head):</p><canvas id="s3" class="sig-canvas mt-2"></canvas><p class="mt-1 border-t border-black pt-1">( Dept Head )</p></div>
+                <div><p>Diinspeksi Oleh:</p><canvas id="s1" class="sig-canvas mt-2"></canvas><button class="no-print text-red-500 mt-1" onclick="p1.clear()">Hapus</button><p class="mt-1 border-t border-black pt-1">( Inspector )</p></div>
+                <div><p>Mengetahui (Spv):</p><canvas id="s2" class="sig-canvas mt-2"></canvas><button class="no-print text-red-500 mt-1" onclick="p2.clear()">Hapus</button><p class="mt-1 border-t border-black pt-1">( Supervisor )</p></div>
+                <div><p>Mengetahui (Head):</p><canvas id="s3" class="sig-canvas mt-2"></canvas><button class="no-print text-red-500 mt-1" onclick="p3.clear()">Hapus</button><p class="mt-1 border-t border-black pt-1">( Dept Head )</p></div>
             </div>
 
             <div class="mt-8 flex gap-4 no-print">
@@ -83,8 +83,8 @@
     </div>
 
     <script>
-        // LOGO PT BATUTUA KHARISMA PERMAI (BASE64) - PERMANEN
-        const batutuaLogo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABpCAMAAABvD84PAAAAVFBMVEUAAAA6OjtXWFlcXWFeX2FmZ2hpZ2h0dXV7enp/f3+BgYGGh4eNjY2YmJikpKSurq64uLjBwcHNzc3Z2dnk5OTs7Ozy8vL6+vr///8+Pj5mZmb////8pY22AAAAAnRSTlMAAHaTzTgAAALGSURBVGje7ZjbcuMgEER7B0ICIZ7//7vLw7W9vrtrmvK0U6VyUqkq70yChA5IuD5LpI/99qT/6H05X86nU8v5tL/8M29Z1iXLumZd16zrunW5N869ZZn9vWVe86vI6z9X8fL/B6f//+D075fD039fDk//fTk8/fcl0n9fIv33/4E8o4O8mYFpZmA2KzB/H0y2Gcg8971fR5YvK9v/6Ff7fGv9pZ/Wf+qN9Z+6S/2n7lZ/Wf+p+9Vf+v8PyP7U9rP39P7z969vXzP7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+8/d7p/pP3X+Wf9S66/1X/W0f9Tae38ByBv8YwaW6+AAAAAElFTkSuQmCC";
+        // Logo PT Batutua (Base64)
+        const batutuaLogo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABpCAMAAABvD84PAAAAVFBMVEUAAAA6OjtXWFlcXWFeX2FmZ2hpZ2h0dXV7enp/f3+BgYGGh4eNjY2YmJikpKSurq64uLjBwcHNzc3Z2dnk5OTs7Ozy8vL6+vr///8+Pj5mZmb////8pY22AAAAAnRSTlMAAHaTzTgAAALGSURBVGje7ZjbcuMgEER7B0ICIZ7//7vLw7W9vrtrmvK0U6VyUqkq70yChA5IuD5LpI/99qT/6H05X86nU8v5tL/8M29Z1iXLumZd16zrunW5N869ZZn9vWVe86vI6z9X8fL/B6f//+D075fD039fDk//fTk8/fcl0n9fIv33/4E8o4O8mYFpZmA2KzB/H0y2Gcg8971fR5YvK9v/6Ff7fGv9pZ/Wf+qN9Z+6S/2n7lZ/Wf+p+9Vf+v8PyP7U9rP39P7z969vXzP7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+89f3zL7+8/d7p/pP3X+Wf9S66/1X/W0f9Tae38ByBv8YwaW6+AAAAAElFTkSuQmCC";
 
         const areaData = {
             "Container T": ["Container bersih & rapi, tidak ada tumpahan/sampah", "Struktur Container (tidak penyok/bocor)", "Pintu container bisa dibuka/tutup dengan baik", "Lantai container kering, tidak licin dan kotor", "Blower berfungsi baik", "Penataan B3 rapi & sesuai jenis", "Kemasan tidak bocor/penyok", "Spill kit tersedia & lengkap", "Container dikunci", "Safety Shower/Eyewash normal", "APAR pressure normal & inspeksi valid", "Label B3 sesuai", "MSDS tersedia dan masih berlaku", "Penerangan cukup"],
@@ -110,10 +110,11 @@
 
         let p1, p2, p3;
         window.onload = () => {
+            // Inisialisasi Tanda Tangan
             p1 = new SignaturePad(document.getElementById('s1'));
             p2 = new SignaturePad(document.getElementById('s2'));
             p3 = new SignaturePad(document.getElementById('s3'));
-            // Tampilkan Logo BTR
+            // Set Logo dari variabel Base64 agar tampil secara permanen
             document.getElementById('form-logo').src = batutuaLogo;
         };
 
@@ -127,16 +128,24 @@
                 body.innerHTML += `<tr><td align="center"><b>${i+1}</b></td><td>${text}<br><button class="btn-camera no-print"><i class="fas fa-camera"></i> Ambil Foto</button></td><td align="center"><input type="radio" name="r${i}" style="transform: scale(1.3);"></td><td align="center"><input type="radio" name="r${i}" style="transform: scale(1.3);"></td></tr>`;
             });
             document.getElementById('modalOverlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             document.getElementById('modalOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
             p1.clear(); p2.clear(); p3.clear();
         }
 
         function savePDF() {
             const element = document.getElementById('printable-area');
-            html2pdf().set({ margin: 0.3, filename: 'Inspeksi_BTR.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4' } }).from(element).save();
+            const area = document.getElementById('loc-name').innerText;
+            html2pdf().set({ 
+                margin: 0.3, 
+                filename: `Inspeksi_${area}.pdf`, 
+                html2canvas: { scale: 2 }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+            }).from(element).save();
         }
     </script>
 </body>
